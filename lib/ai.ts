@@ -47,26 +47,27 @@ export const initAI = () => {
   try {
     genAI = new GoogleGenerativeAI(API_KEY);
     
-    // Try using Gemini 3 first
+    // Using confirmed available models from your API key list
     try {
+      // Primary: Gemini 2.5 Flash (Fast, stable, latest generation)
       model = genAI.getGenerativeModel({ 
-        model: "gemini-3-pro-latest",
+        model: "gemini-2.5-flash",
         systemInstruction: SYSTEM_PROMPT,
       });
     } catch (e) {
-      console.warn("Gemini 3 not available, trying fallback models", e);
+      console.warn("Gemini 2.5 Flash not available, trying fallbacks", e);
       
-      // Fallback to stable models
       try {
+        // Fallback 1: Gemini 2.0 Flash
         model = genAI.getGenerativeModel({ 
-          model: "gemini-2.0-flash", // Try 2.0 Flash next
+          model: "gemini-2.0-flash",
           systemInstruction: SYSTEM_PROMPT,
         });
       } catch (e2) {
-        console.warn("Gemini 2.0 Flash not available, using gemini-pro", e2);
-        // Final fallback to widely supported gemini-pro
+        // Fallback 2: Gemini 3 Pro Preview (Experimental but powerful)
+        console.warn("Gemini 2.0 Flash not available, trying Gemini 3 Preview", e2);
         model = genAI.getGenerativeModel({ 
-          model: "gemini-pro",
+          model: "gemini-3-pro-preview",
           systemInstruction: SYSTEM_PROMPT,
         });
       }
