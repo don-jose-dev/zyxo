@@ -102,8 +102,8 @@ export const chatWithAI = async (userMessage: string, history: { role: 'user' | 
     if (errorMsg.includes('PERMISSION_DENIED')) {
       return "Access Denied: The API key doesn't have permission for this model.";
     }
-    if (errorMsg.includes('quota') || errorMsg.includes('RESOURCE_EXHAUSTED')) {
-      return "The AI service is temporarily busy. Please try again in a moment.";
+    if (errorMsg.includes('quota') || errorMsg.includes('RESOURCE_EXHAUSTED') || errorMsg.includes('429') || errorMsg.includes('Too Many Requests')) {
+      return "I'm getting a lot of questions right now! Please wait 30 seconds and try again. 💬";
     }
     if (errorMsg.includes('not found') || errorMsg.includes('NOT_FOUND')) {
       return "Model not available. Please try again later.";
