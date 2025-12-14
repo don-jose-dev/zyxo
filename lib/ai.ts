@@ -37,57 +37,78 @@ Guidelines:
 let genAI: GoogleGenerativeAI | null = null;
 let model: any = null;
 
-const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || process.env.GEMINI_API_KEY;
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || (typeof process !== 'undefined' ? process.env?.GEMINI_API_KEY : undefined);
 
 export const initAI = () => {
   if (!API_KEY) {
     console.warn("Gemini API Key is missing. Make sure VITE_GEMINI_API_KEY is set in your .env file.");
-    return;
+    return false;
   }
-  genAI = new GoogleGenerativeAI(API_KEY);
-  // Using gemini-1.5-pro for better reasoning capabilities
-  model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
+  try {
+    genAI = new GoogleGenerativeAI(API_KEY);
+    // Using latest gemini-2.0-flash model
+    model = genAI.getGenerativeModel({ 
+      model: "gemini-2.0-flash",
+      systemInstruction: SYSTEM_PROMPT,
+    });
+    return true;
+  } catch (err) {
+    console.error("Failed to initialize Gemini:", err);
+    return false;
+  }
 };
 
 export const chatWithAI = async (userMessage: string, history: { role: 'user' | 'model', parts: string }[]) => {
-  if (!API_KEY) return "Configuration Error: API Key is missing. Please set VITE_GEMINI_API_KEY in your environment variables.";
+  if (!API_KEY) {
+    return "Configuration Error: API Key is missing. Please set VITE_GEMINI_API_KEY in your environment variables.";
+  }
   
-  if (!model) initAI();
-  if (!model) return "I'm currently offline (Model initialization failed).";
+  if (!model) {
+    const initialized = initAI();
+    if (!initialized || !model) {
+      return "I'm currently offline. Please contact us via WhatsApp.";
+    }
+  }
 
   try {
+    // Build conversation history for context
+    const chatHistory = history.map(h => ({
+      role: h.role,
+      parts: [{ text: h.parts }]
+    }));
+
     const chat = model.startChat({
-      history: [
-        {
-          role: "user",
-          parts: [{ text: SYSTEM_PROMPT }]
-        },
-        {
-          role: "model",
-          parts: [{ text: "Understood. I am ready to assist potential ZYXO clients." }]
-        },
-        ...history.map(h => ({
-          role: h.role,
-          parts: [{ text: h.parts }]
-        }))
-      ],
+      history: chatHistory,
     });
 
     const result = await chat.sendMessage(userMessage);
-    const response = await result.response;
-    return response.text();
+    const response = result.response;
+    const text = response.text();
+    
+    if (!text) {
+      return "I received an empty response. Please try again.";
+    }
+    
+    return text;
   } catch (error: any) {
     console.error("AI Chat Error Details:", error);
     
-    // Check for common errors
-    if (error.message?.includes('API key not valid')) {
-      return "Configuration Error: The provided API key is invalid.";
+    // Provide specific error messages
+    const errorMsg = error?.message || error?.toString() || 'Unknown error';
+    
+    if (errorMsg.includes('API key not valid') || errorMsg.includes('API_KEY_INVALID')) {
+      return "Configuration Error: The API key is invalid. Please check your settings.";
     }
-    if (error.message?.includes('PERMISSION_DENIED')) {
-      return "Access Denied: The API key does not have permission to access this model.";
+    if (errorMsg.includes('PERMISSION_DENIED')) {
+      return "Access Denied: The API key doesn't have permission for this model.";
+    }
+    if (errorMsg.includes('quota') || errorMsg.includes('RESOURCE_EXHAUSTED')) {
+      return "The AI service is temporarily busy. Please try again in a moment.";
+    }
+    if (errorMsg.includes('not found') || errorMsg.includes('NOT_FOUND')) {
+      return "Model not available. Please try again later.";
     }
     
-    return `I apologize, but I'm having trouble connecting to my brain right now. (Error: ${error.message || 'Unknown'})`;
+    return `Sorry, I encountered an error: ${errorMsg.substring(0, 100)}`;
   }
 };
-
