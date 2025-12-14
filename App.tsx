@@ -7,6 +7,7 @@ import Comparison from './components/Comparison';
 import FinalCTA from './components/FinalCTA';
 import Logo from './components/Logo';
 import ErrorBoundary from './components/ErrorBoundary';
+import ChatWidget from './components/ChatWidget';
 import { CONTENT } from './lib/content';
 import { throttle, ANIMATION, SECTION_NAMES } from './lib/utils';
 
@@ -253,6 +254,9 @@ export default function App() {
             {CONTENT.brand.contact.website} // © 2025
           </footer>
         </div>
+        
+        {/* AI Chat Widget */}
+        <ChatWidget />
       </main>
     </ErrorBoundary>
   );
