@@ -87,6 +87,16 @@ const FinalCTA: React.FC<FinalCTAProps> = () => {
               />
             </button>
           </div>
+          
+          {/* Policy Links Footer */}
+          <div className="mt-16 pt-8 border-t border-white/5 text-center">
+            <div className="flex flex-wrap justify-center gap-6 text-xs text-gray-500 font-mono uppercase tracking-widest mb-4">
+              <a href="/terms.html" className="hover:text-zyxo-green transition-colors pointer-events-auto z-50">Terms of Service</a>
+              <a href="/privacy.html" className="hover:text-zyxo-green transition-colors pointer-events-auto z-50">Privacy Policy</a>
+              <a href="/refund.html" className="hover:text-zyxo-green transition-colors pointer-events-auto z-50">Refund Policy</a>
+            </div>
+            <p className="text-[10px] text-gray-700">© 2025 ZYXO Digital Solutions. All rights reserved.</p>
+          </div>
         </motion.div>
       </div>
     </section>
