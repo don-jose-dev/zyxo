@@ -45,7 +45,8 @@ export const initAI = () => {
     return;
   }
   genAI = new GoogleGenerativeAI(API_KEY);
-  model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+  // Using gemini-1.5-pro for better reasoning capabilities
+  model = genAI.getGenerativeModel({ model: "gemini-1.5-pro" });
 };
 
 export const chatWithAI = async (userMessage: string, history: { role: 'user' | 'model', parts: string }[]) => {
@@ -75,9 +76,18 @@ export const chatWithAI = async (userMessage: string, history: { role: 'user' | 
     const result = await chat.sendMessage(userMessage);
     const response = await result.response;
     return response.text();
-  } catch (error) {
-    console.error("AI Chat Error:", error);
-    return "I apologize, but I'm having trouble processing your request right now. Please try again.";
+  } catch (error: any) {
+    console.error("AI Chat Error Details:", error);
+    
+    // Check for common errors
+    if (error.message?.includes('API key not valid')) {
+      return "Configuration Error: The provided API key is invalid.";
+    }
+    if (error.message?.includes('PERMISSION_DENIED')) {
+      return "Access Denied: The API key does not have permission to access this model.";
+    }
+    
+    return `I apologize, but I'm having trouble connecting to my brain right now. (Error: ${error.message || 'Unknown'})`;
   }
 };
 
