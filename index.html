@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>ZYXO | Digital Infrastructure</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@100..800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            fontFamily: {
+              mono: ['"JetBrains Mono"', 'monospace'],
+            },
+            colors: {
+              zyxo: {
+                bg: '#050505',
+                green: '#ccff00', // Acid green
+                blue: '#00f0ff', // Signal blue
+                surface: '#0a0a0a',
+                border: '#1a1a1a'
+              }
+            },
+            backgroundImage: {
+              'grid-pattern': "linear-gradient(to right, #1a1a1a 1px, transparent 1px), linear-gradient(to bottom, #1a1a1a 1px, transparent 1px)",
+            }
+          }
+        }
+      }
+    </script>
+    <style>
+      body {
+        background-color: #050505;
+        color: #e5e5e5;
+        font-family: 'JetBrains Mono', monospace;
+      }
+      /* Custom Scrollbar */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #050505; 
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #333; 
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #ccff00; 
+      }
+      .glitch-text {
+        position: relative;
+      }
+      .glitch-text::before,
+      .glitch-text::after {
+        content: attr(data-text);
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+      }
+      .glitch-text::before {
+        left: 2px;
+        text-shadow: -1px 0 #ccff00;
+        clip: rect(44px, 450px, 56px, 0);
+        animation: glitch-anim 5s infinite linear alternate-reverse;
+      }
+      .glitch-text::after {
+        left: -2px;
+        text-shadow: -1px 0 #00f0ff;
+        clip: rect(44px, 450px, 56px, 0);
+        animation: glitch-anim2 5s infinite linear alternate-reverse;
+      }
+      @keyframes glitch-anim {
+        0% { clip: rect(35px, 9999px, 16px, 0); }
+        5% { clip: rect(78px, 9999px, 96px, 0); }
+        100% { clip: rect(12px, 9999px, 64px, 0); }
+      }
+      @keyframes glitch-anim2 {
+        0% { clip: rect(65px, 9999px, 86px, 0); }
+        5% { clip: rect(18px, 9999px, 26px, 0); }
+        100% { clip: rect(4px, 9999px, 84px, 0); }
+      }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "framer-motion": "https://esm.sh/framer-motion@^12.23.26",
+    "lucide-react": "https://esm.sh/lucide-react@^0.561.0"
+  }
+}
+</script>
+</head>
+  <body>
+    <div id="root"></div>
+  </body>
+</html>
