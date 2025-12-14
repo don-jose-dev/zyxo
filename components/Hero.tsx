@@ -112,7 +112,7 @@ const Hero: React.FC<HeroProps> = ({ onNavigate }) => {
 
         <h1 
           id="hero-headline"
-          className="text-4xl md:text-7xl font-bold mb-8 leading-tight text-center max-w-4xl mx-auto tracking-tight"
+          className="text-3xl sm:text-4xl md:text-7xl font-bold mb-6 md:mb-8 leading-tight text-center max-w-4xl mx-auto tracking-tight px-2"
         >
           <span className="block text-white mb-2 md:mb-4">
             <ScrambleText text={line1} delay={0.2} />
@@ -125,7 +125,7 @@ const Hero: React.FC<HeroProps> = ({ onNavigate }) => {
         </h1>
 
         <motion.p 
-          className="text-gray-400 max-w-2xl mx-auto text-lg md:text-xl mb-12 leading-relaxed text-center"
+          className="text-gray-400 max-w-2xl mx-auto text-base md:text-xl mb-8 md:mb-12 leading-relaxed text-center px-4"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, delay: 2.2 }}

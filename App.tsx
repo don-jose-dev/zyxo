@@ -184,7 +184,7 @@ export default function App() {
         </a>
         
         {/* Absolute Logo */}
-        <header className="absolute top-8 left-8 z-50 mix-blend-difference">
+        <header className="absolute top-6 left-6 md:top-8 md:left-8 z-50 mix-blend-difference">
           <div 
             className="flex items-center gap-3 cursor-pointer group" 
             onClick={() => scrollToSection(0)}
@@ -193,8 +193,8 @@ export default function App() {
             tabIndex={0}
             aria-label="ZYXO - Go to homepage"
           >
-            <Logo size={28} />
-            <span className="font-bold text-lg tracking-[0.2em] text-white hidden md:block group-hover:text-zyxo-blue transition-colors">
+            <Logo size={24} className="md:w-8 md:h-8" />
+            <span className="font-bold text-sm md:text-lg tracking-[0.2em] text-white hidden md:block group-hover:text-zyxo-blue transition-colors">
               ZYXO
             </span>
           </div>
@@ -202,7 +202,7 @@ export default function App() {
 
         {/* Pagination Indicators */}
         <nav 
-          className="absolute right-6 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-4"
+          className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-3 md:gap-4 hidden sm:flex"
           aria-label="Section navigation"
           role="navigation"
         >

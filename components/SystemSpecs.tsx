@@ -72,7 +72,7 @@ const SpecCard: React.FC<SpecCardProps> = ({ module, index }) => {
 
   return (
     <motion.article
-      className="relative group h-64 bg-[#0a0a0a] overflow-hidden p-8 flex flex-col justify-between"
+      className="relative group min-h-[16rem] h-auto md:h-64 bg-[#0a0a0a] overflow-hidden p-6 md:p-8 flex flex-col justify-between"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onFocus={() => setIsHovered(true)}

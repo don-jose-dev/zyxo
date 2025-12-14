@@ -55,11 +55,11 @@ const FinalCTA: React.FC<FinalCTAProps> = () => {
 
           <h2 
             id="cta-title"
-            className="text-5xl font-bold text-white mb-6 tracking-tight leading-tight"
+            className="text-3xl md:text-5xl font-bold text-white mb-4 md:mb-6 tracking-tight leading-tight"
           >
             {CONTENT.finalCta.title}
           </h2>
-          <p className="text-gray-400 mb-12 text-lg max-w-lg mx-auto leading-relaxed">
+          <p className="text-gray-400 mb-8 md:mb-12 text-base md:text-lg max-w-lg mx-auto leading-relaxed px-4">
             {CONTENT.finalCta.subtitle}
           </p>
           

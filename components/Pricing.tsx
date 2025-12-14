@@ -29,9 +29,9 @@ const Pricing: React.FC<PricingProps> = () => {
         <motion.div 
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
-          className="text-center mb-8 md:mb-12"
+          className="text-center mb-8 md:mb-12 pt-10 md:pt-0"
         >
-          <h2 id="pricing-title" className="text-3xl md:text-4xl font-bold text-white mb-2">
+          <h2 id="pricing-title" className="text-2xl md:text-4xl font-bold text-white mb-2">
             {CONTENT.pricing.title}
           </h2>
           <p className="text-gray-400 max-w-xl mx-auto text-sm">

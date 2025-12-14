@@ -18,11 +18,11 @@ const Comparison: React.FC<ComparisonProps> = () => {
         <motion.div 
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          className="mb-12"
+          className="mb-8 md:mb-12 pt-10 md:pt-0"
         >
           <h2 
             id="comparison-title" 
-            className="text-2xl font-bold text-white mb-2 font-mono flex items-center gap-3"
+            className="text-xl md:text-2xl font-bold text-white mb-2 font-mono flex items-center gap-3"
           >
             <span className="w-2 h-8 bg-zyxo-green block shadow-[0_0_15px_#ccff00]" aria-hidden="true" />
             {CONTENT.comparison.title}
