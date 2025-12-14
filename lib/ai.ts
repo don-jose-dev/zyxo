@@ -46,11 +46,21 @@ export const initAI = () => {
   }
   try {
     genAI = new GoogleGenerativeAI(API_KEY);
-    // Using latest gemini-2.0-flash model
-    model = genAI.getGenerativeModel({ 
-      model: "gemini-2.0-flash",
-      systemInstruction: SYSTEM_PROMPT,
-    });
+    // Try gemini-1.5-flash first (stable and widely available)
+    // If it fails, the error handler will catch it
+    try {
+      model = genAI.getGenerativeModel({ 
+        model: "gemini-1.5-flash",
+        systemInstruction: SYSTEM_PROMPT,
+      });
+    } catch (modelError) {
+      // Fallback to gemini-pro if flash is not available
+      console.warn("Failed to load gemini-1.5-flash, trying gemini-pro:", modelError);
+      model = genAI.getGenerativeModel({ 
+        model: "gemini-pro",
+        systemInstruction: SYSTEM_PROMPT,
+      });
+    }
     return true;
   } catch (err) {
     console.error("Failed to initialize Gemini:", err);
@@ -90,7 +100,16 @@ export const chatWithAI = async (userMessage: string, history: { role: 'user' | 
         : {}
     );
 
-    const result = await chat.sendMessage(userMessage);
+    // Add timeout to prevent hanging requests (30 seconds)
+    const timeoutPromise = new Promise((_, reject) => {
+      setTimeout(() => reject(new Error('Request timeout after 30 seconds')), 30000);
+    });
+
+    const result = await Promise.race([
+      chat.sendMessage(userMessage),
+      timeoutPromise
+    ]) as any;
+    
     const response = result.response;
     const text = response.text();
     
@@ -104,20 +123,30 @@ export const chatWithAI = async (userMessage: string, history: { role: 'user' | 
     
     // Provide specific error messages
     const errorMsg = error?.message || error?.toString() || 'Unknown error';
+    const errorString = JSON.stringify(error, null, 2);
     
-    if (errorMsg.includes('API key not valid') || errorMsg.includes('API_KEY_INVALID')) {
+    // Check for network/fetch errors
+    if (errorMsg.includes('fetch') || errorMsg.includes('network') || errorMsg.includes('Failed to fetch') || errorMsg.includes('NetworkError')) {
+      return "Network Error: Unable to connect to the AI service. Please check your internet connection and try again.";
+    }
+    
+    if (errorMsg.includes('API key not valid') || errorMsg.includes('API_KEY_INVALID') || errorMsg.includes('401')) {
       return "Configuration Error: The API key is invalid. Please check your settings.";
     }
-    if (errorMsg.includes('PERMISSION_DENIED')) {
+    if (errorMsg.includes('PERMISSION_DENIED') || errorMsg.includes('403')) {
       return "Access Denied: The API key doesn't have permission for this model.";
     }
     if (errorMsg.includes('quota') || errorMsg.includes('RESOURCE_EXHAUSTED') || errorMsg.includes('429') || errorMsg.includes('Too Many Requests')) {
       return "I'm getting a lot of questions right now! Please wait 30 seconds and try again. 💬";
     }
-    if (errorMsg.includes('not found') || errorMsg.includes('NOT_FOUND')) {
-      return "Model not available. Please try again later.";
+    if (errorMsg.includes('not found') || errorMsg.includes('NOT_FOUND') || errorMsg.includes('404') || errorMsg.includes('v1beta/mod')) {
+      return "Model not available. The AI service is temporarily unavailable. Please try again later or contact us via WhatsApp.";
+    }
+    if (errorMsg.includes('timeout') || errorMsg.includes('TIMEOUT')) {
+      return "Request timed out. The AI service took too long to respond. Please try again.";
     }
     
-    return `Sorry, I encountered an error: ${errorMsg.substring(0, 100)}`;
+    // Generic error - show a user-friendly message instead of technical details
+    return "I'm having trouble connecting right now. Please try again in a moment, or contact us directly via WhatsApp for immediate assistance.";
   }
 };
