@@ -30,7 +30,45 @@ const Comparison: React.FC<ComparisonProps> = () => {
           <p className="text-gray-400 text-sm ml-5">{CONTENT.comparison.subtitle}</p>
         </motion.div>
 
-        <div className="relative overflow-hidden rounded-xl border border-white/10 bg-[#0a0a0a]">
+        {/* Mobile View: Cards */}
+        <div className="md:hidden space-y-4">
+          {CONTENT.comparison.rows.map((row, index) => (
+            <motion.div
+              key={index}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
+              className="bg-[#0a0a0a] border border-white/10 rounded-lg p-4"
+            >
+              <h3 className="text-sm font-mono text-white mb-3 pb-2 border-b border-white/5">
+                {row.item}
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="flex flex-col items-center gap-2">
+                  <span className="text-[10px] uppercase tracking-widest text-zyxo-blue">Starter</span>
+                  <StatusIcon 
+                    status={row.a} 
+                    color="text-zyxo-blue" 
+                    shadow="shadow-[0_0_10px_#00f0ff]" 
+                    label={row.a ? `${row.item} included in Starter` : `${row.item} not included in Starter`}
+                  />
+                </div>
+                <div className="flex flex-col items-center gap-2 border-l border-white/5 bg-zyxo-green/[0.02] rounded-r py-1">
+                  <span className="text-[10px] uppercase tracking-widest text-zyxo-green">Business</span>
+                  <StatusIcon 
+                    status={row.b} 
+                    color="text-zyxo-green" 
+                    shadow="shadow-[0_0_10px_#ccff00]" 
+                    label={row.b ? `${row.item} included in Business` : `${row.item} not included in Business`}
+                  />
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Desktop View: Table */}
+        <div className="hidden md:block relative overflow-hidden rounded-xl border border-white/10 bg-[#0a0a0a]">
           {/* Business Column Highlight Glow - Behind table */}
           <div 
             className="absolute top-0 right-0 w-[30%] h-full bg-zyxo-green/5 blur-xl pointer-events-none" 
