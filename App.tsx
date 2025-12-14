@@ -184,7 +184,7 @@ export default function App() {
         </a>
         
         {/* Absolute Logo */}
-        <header className="absolute top-6 left-6 md:top-8 md:left-8 z-50 mix-blend-difference">
+        <header className="fixed top-6 left-6 md:top-8 md:left-8 z-[100] mix-blend-difference">
           <div 
             className="flex items-center gap-3 cursor-pointer group" 
             onClick={() => scrollToSection(0)}
