@@ -184,9 +184,9 @@ export default function App() {
         </a>
         
         {/* Absolute Logo */}
-        <header className="fixed top-6 left-6 md:top-8 md:left-8 z-[100] mix-blend-difference">
+        <header className="fixed top-6 left-6 md:top-8 md:left-8 z-[100]">
           <div 
-            className="flex items-center gap-3 cursor-pointer group" 
+            className="flex items-center gap-2 md:gap-3 cursor-pointer group" 
             onClick={() => scrollToSection(0)}
             onKeyDown={(e) => e.key === 'Enter' && scrollToSection(0)}
             role="button"
@@ -194,7 +194,7 @@ export default function App() {
             aria-label="ZYXO - Go to homepage"
           >
             <Logo size={24} className="md:w-8 md:h-8" />
-            <span className="font-bold text-sm md:text-lg tracking-[0.2em] text-white hidden md:block group-hover:text-zyxo-blue transition-colors">
+            <span className="font-bold text-sm md:text-lg tracking-[0.15em] md:tracking-[0.2em] text-white group-hover:text-zyxo-blue transition-colors">
               ZYXO
             </span>
           </div>
