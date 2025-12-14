@@ -1,4 +1,6 @@
-export const CONTENT = {
+import type { Content } from './types';
+
+export const CONTENT: Content = {
   brand: {
     name: "ZYXO",
     tagline: "High-Performance Digital Solutions",
@@ -13,7 +15,6 @@ export const CONTENT = {
     subhead: "Most websites are static and forgotten. ZYXO builds active, high-performance digital platforms designed to grow with your business.", 
     cta: "View Plans"
   },
-  // Reframed as Professional Features instead of System Specs
   systemSpecs: {
     title: "Key Capabilities",
     subtitle: "Features designed for performance and growth.",
