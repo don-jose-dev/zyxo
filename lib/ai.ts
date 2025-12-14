@@ -72,14 +72,23 @@ export const chatWithAI = async (userMessage: string, history: { role: 'user' | 
 
   try {
     // Build conversation history for context
-    const chatHistory = history.map(h => ({
+    // Filter to ensure history starts with 'user' role (Gemini requirement)
+    let chatHistory = history.map(h => ({
       role: h.role,
       parts: [{ text: h.parts }]
     }));
 
-    const chat = model.startChat({
-      history: chatHistory,
-    });
+    // If history starts with 'model', remove it (shouldn't happen but safety check)
+    if (chatHistory.length > 0 && chatHistory[0].role === 'model') {
+      chatHistory = chatHistory.slice(1);
+    }
+
+    // Only pass history if it's not empty and starts with user
+    const chat = model.startChat(
+      chatHistory.length > 0 && chatHistory[0].role === 'user'
+        ? { history: chatHistory }
+        : {}
+    );
 
     const result = await chat.sendMessage(userMessage);
     const response = result.response;

@@ -35,8 +35,10 @@ const ChatWidget = () => {
     setInput('');
     setIsLoading(true);
 
-    // Prepare history for API
-    const history = messages.map(m => ({
+    // Prepare history for API - exclude welcome message and ensure it starts with user
+    // Filter out welcome message and only include actual conversation pairs
+    const conversationMessages = messages.filter(m => m.id !== 'welcome');
+    const history = conversationMessages.map(m => ({
       role: m.role,
       parts: m.text
     }));
