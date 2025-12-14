@@ -43,6 +43,10 @@ const ChatWidget = () => {
 
     const responseText = await chatWithAI(userMsg.text, history);
     
+    if (responseText.includes("offline") || responseText.includes("trouble")) {
+        // Optional: specific error styling or handling
+    }
+
     const botMsg: Message = { id: (Date.now() + 1).toString(), role: 'model', text: responseText };
     setMessages(prev => [...prev, botMsg]);
     setIsLoading(false);

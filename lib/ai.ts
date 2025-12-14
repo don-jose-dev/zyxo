@@ -41,7 +41,7 @@ const API_KEY = import.meta.env.VITE_GEMINI_API_KEY || process.env.GEMINI_API_KE
 
 export const initAI = () => {
   if (!API_KEY) {
-    console.warn("Gemini API Key is missing");
+    console.warn("Gemini API Key is missing. Make sure VITE_GEMINI_API_KEY is set in your .env file.");
     return;
   }
   genAI = new GoogleGenerativeAI(API_KEY);
@@ -49,8 +49,10 @@ export const initAI = () => {
 };
 
 export const chatWithAI = async (userMessage: string, history: { role: 'user' | 'model', parts: string }[]) => {
+  if (!API_KEY) return "Configuration Error: API Key is missing. Please set VITE_GEMINI_API_KEY in your environment variables.";
+  
   if (!model) initAI();
-  if (!model) return "I'm currently offline. Please try again later or contact us directly via WhatsApp.";
+  if (!model) return "I'm currently offline (Model initialization failed).";
 
   try {
     const chat = model.startChat({
