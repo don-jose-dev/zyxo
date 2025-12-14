@@ -46,21 +46,12 @@ export const initAI = () => {
   }
   try {
     genAI = new GoogleGenerativeAI(API_KEY);
-    // Try gemini-1.5-flash first (stable and widely available)
-    // If it fails, the error handler will catch it
-    try {
-      model = genAI.getGenerativeModel({ 
-        model: "gemini-1.5-flash",
-        systemInstruction: SYSTEM_PROMPT,
-      });
-    } catch (modelError) {
-      // Fallback to gemini-pro if flash is not available
-      console.warn("Failed to load gemini-1.5-flash, trying gemini-pro:", modelError);
-      model = genAI.getGenerativeModel({ 
-        model: "gemini-pro",
-        systemInstruction: SYSTEM_PROMPT,
-      });
-    }
+    // Use gemini-pro as it's the most widely supported and stable model
+    // This is the original Gemini model that works reliably across all API versions
+    model = genAI.getGenerativeModel({ 
+      model: "gemini-pro",
+      systemInstruction: SYSTEM_PROMPT,
+    });
     return true;
   } catch (err) {
     console.error("Failed to initialize Gemini:", err);
