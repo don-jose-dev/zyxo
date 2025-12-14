@@ -28,8 +28,8 @@ export const ANIMATION = {
   SCROLL_THRESHOLD: 50,
   /** Throttle interval for scroll events in ms */
   SCROLL_THROTTLE: 100,
-  /** Touch swipe threshold in pixels */
-  TOUCH_THRESHOLD: 50,
+  /** Touch swipe threshold in pixels (reduced for mobile, but still requires velocity) */
+  TOUCH_THRESHOLD: 40,
 } as const;
 
 /**

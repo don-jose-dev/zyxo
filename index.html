@@ -2,7 +2,7 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover" />
     <title>ZYXO | Digital Infrastructure</title>
     
     <!-- SEO Meta Tags -->
@@ -54,10 +54,43 @@
       }
     </script>
     <style>
+      html {
+        /* Prevent Android Chrome pull-to-refresh */
+        overscroll-behavior-y: none;
+        height: 100%;
+      }
+      
       body {
         background-color: #050505;
         color: #e5e5e5;
         font-family: 'JetBrains Mono', monospace;
+        /* Prevent Android Chrome address bar bounce and pull-to-refresh */
+        overscroll-behavior: none;
+        /* Better touch handling on Android */
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+        height: 100%;
+        margin: 0;
+        padding: 0;
+      }
+      
+      #root {
+        height: 100%;
+      }
+      
+      /* Android Chrome viewport height fix */
+      @supports (-webkit-touch-callout: none) {
+        /* iOS */
+        .h-screen {
+          height: 100vh;
+        }
+      }
+      
+      @supports not (-webkit-touch-callout: none) {
+        /* Android and others */
+        .h-screen {
+          height: 100dvh; /* Dynamic viewport height */
+        }
       }
       /* Custom Scrollbar */
       ::-webkit-scrollbar {

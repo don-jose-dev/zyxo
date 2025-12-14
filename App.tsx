@@ -87,29 +87,106 @@ export default function App() {
     };
 
     let touchStartY = 0;
+    let touchStartTime = 0;
+    let touchMoved = false;
+    let lastTouchY = 0;
+    
     const handleTouchStart = (e: TouchEvent) => {
+      if (e.touches.length !== 1) return; // Only handle single touch
       touchStartY = e.touches[0].clientY;
+      lastTouchY = touchStartY;
+      touchStartTime = Date.now();
+      touchMoved = false;
+    };
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length !== 1) return;
+      const currentY = e.touches[0].clientY;
+      const deltaY = Math.abs(currentY - touchStartY);
+      
+      // Mark that touch has moved
+      if (deltaY > 10) {
+        touchMoved = true;
+      }
+
+      // Check if user is scrolling within a section
+      const currentSection = containerRef.current?.querySelector('.section-content') as HTMLElement;
+      if (currentSection) {
+        const { scrollTop, scrollHeight, clientHeight } = currentSection;
+        const hasScrollableContent = scrollHeight > clientHeight;
+        
+        if (hasScrollableContent) {
+          const isScrollingDown = currentY < lastTouchY && scrollTop < scrollHeight - clientHeight - 5;
+          const isScrollingUp = currentY > lastTouchY && scrollTop > 5;
+          
+          // If section is scrollable and user is scrolling within it, prevent navigation
+          if (isScrollingDown || isScrollingUp) {
+            return;
+          }
+        }
+      }
+      
+      lastTouchY = currentY;
     };
     
     const handleTouchEnd = (e: TouchEvent) => {
-      if (isScrolling) return;
+      if (isScrolling || !touchMoved) return;
+      if (e.changedTouches.length !== 1) return;
+      
       const touchEndY = e.changedTouches[0].clientY;
+      const touchEndTime = Date.now();
       const deltaY = touchStartY - touchEndY;
+      const touchDuration = touchEndTime - touchStartTime;
+      
+      // Calculate velocity (pixels per ms)
+      const velocity = Math.abs(deltaY) / Math.max(touchDuration, 1);
+      
+      // Detect Android (typically has lower velocity threshold needs)
+      const isAndroid = /Android/i.test(navigator.userAgent);
+      // Android swipes are typically faster, iOS needs more deliberate swipes
+      const minVelocity = isAndroid ? 0.15 : 0.2;
+      const minVelocityForScrollable = isAndroid ? 0.25 : 0.3;
 
-      const currentSection = containerRef.current?.querySelector('.section-content');
+      const currentSection = containerRef.current?.querySelector('.section-content') as HTMLElement;
       if (currentSection) {
         const { scrollTop, scrollHeight, clientHeight } = currentSection;
-        if (scrollHeight > clientHeight) {
-          // Use 5px buffer for better mobile support
-          if (deltaY > 0 && scrollTop + clientHeight < scrollHeight - 5) return;
-          if (deltaY < 0 && scrollTop > 5) return;
+        const hasScrollableContent = scrollHeight > clientHeight;
+        
+        if (hasScrollableContent) {
+          // More strict check: must be at top/bottom AND have sufficient swipe
+          const atTop = scrollTop <= 5;
+          const atBottom = scrollTop + clientHeight >= scrollHeight - 5;
+          
+          if (!atTop && !atBottom) return; // Not at edges, so user was scrolling within section
+          
+          // At edge, but still check if swipe is intentional
+          if (Math.abs(deltaY) < ANIMATION.TOUCH_THRESHOLD || velocity < minVelocityForScrollable) return;
+        } else {
+          // No scrollable content, require stronger swipe gesture
+          if (Math.abs(deltaY) < ANIMATION.TOUCH_THRESHOLD || velocity < minVelocity) return;
         }
       }
 
-      if (Math.abs(deltaY) > ANIMATION.TOUCH_THRESHOLD) {
-        if (deltaY > 0) scrollToSection(activeIndex + 1);
-        else scrollToSection(activeIndex - 1);
+      // Only navigate if swipe is significant and fast enough
+      if (Math.abs(deltaY) > ANIMATION.TOUCH_THRESHOLD && velocity > minVelocity) {
+        if (deltaY > 0) {
+          scrollToSection(activeIndex + 1);
+        } else {
+          scrollToSection(activeIndex - 1);
+        }
       }
+      
+      // Reset touch state
+      touchMoved = false;
+      touchStartY = 0;
+      touchStartTime = 0;
+    };
+
+    const handleTouchCancel = () => {
+      // Reset touch state on cancel (e.g., iOS gestures)
+      touchMoved = false;
+      touchStartY = 0;
+      touchStartTime = 0;
     };
 
     // Keyboard navigation
@@ -140,13 +217,17 @@ export default function App() {
 
     window.addEventListener('wheel', handleWheel, { passive: true });
     window.addEventListener('touchstart', handleTouchStart, { passive: true });
+    window.addEventListener('touchmove', handleTouchMove, { passive: true });
     window.addEventListener('touchend', handleTouchEnd, { passive: true });
+    window.addEventListener('touchcancel', handleTouchCancel, { passive: true });
     window.addEventListener('keydown', handleKeyDown);
     
     return () => {
       window.removeEventListener('wheel', handleWheel);
       window.removeEventListener('touchstart', handleTouchStart);
+      window.removeEventListener('touchmove', handleTouchMove);
       window.removeEventListener('touchend', handleTouchEnd);
+      window.removeEventListener('touchcancel', handleTouchCancel);
       window.removeEventListener('keydown', handleKeyDown);
     };
   }, [activeIndex, isScrolling, scrollToSection, handleScroll]);
@@ -202,7 +283,7 @@ export default function App() {
           </div>
         </header>
 
-        {/* Pagination Indicators */}
+        {/* Pagination Indicators - Desktop */}
         <nav 
           className="absolute right-4 md:right-6 top-1/2 -translate-y-1/2 z-50 flex flex-col gap-3 md:gap-4 hidden sm:flex"
           aria-label="Section navigation"
@@ -218,6 +299,27 @@ export default function App() {
                 activeIndex === idx 
                   ? 'h-6 bg-zyxo-green shadow-[0_0_8px_rgba(204,255,0,0.5)]' 
                   : 'h-1 bg-white/10 hover:bg-white/30'
+              }`}
+            />
+          ))}
+        </nav>
+
+        {/* Mobile Navigation Dots - Bottom */}
+        <nav 
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex gap-2 sm:hidden"
+          aria-label="Section navigation"
+          role="navigation"
+        >
+          {SECTIONS.map((section, idx) => (
+            <button
+              key={section.id}
+              onClick={() => scrollToSection(idx)}
+              aria-label={`Go to ${SECTION_NAMES[idx]} section`}
+              aria-current={activeIndex === idx ? 'true' : undefined}
+              className={`transition-all duration-300 rounded-full focus:outline-none focus:ring-2 focus:ring-zyxo-green focus:ring-offset-2 focus:ring-offset-[#050505] ${
+                activeIndex === idx 
+                  ? 'w-8 h-2 bg-zyxo-green shadow-[0_0_8px_rgba(204,255,0,0.5)]' 
+                  : 'w-2 h-2 bg-white/20 active:bg-white/40'
               }`}
             />
           ))}
@@ -239,6 +341,11 @@ export default function App() {
               exit={pageVariants.exit}
               transition={reducedMotion ? { duration: 0.1 } : { duration: 0.6, ease: [0.22, 1, 0.36, 1] }}
               className="w-full h-full section-content overflow-y-auto overflow-x-hidden"
+              style={{ 
+                WebkitOverflowScrolling: 'touch', 
+                touchAction: 'pan-y',
+                overscrollBehavior: 'contain' // Prevent Android Chrome overscroll bounce
+              }}
               role="region"
               aria-label={SECTION_NAMES[activeIndex]}
             >
