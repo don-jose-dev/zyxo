@@ -81,44 +81,71 @@ export const chatWithAI = async (userMessage: string, history: { role: 'user' | 
     }
   }
 
-  try {
-    // Build conversation history for context
-    // Filter to ensure history starts with 'user' role (Gemini requirement)
-    let chatHistory = history.map(h => ({
-      role: h.role,
-      parts: [{ text: h.parts }]
-    }));
-
-    // If history starts with 'model', remove it (shouldn't happen but safety check)
-    if (chatHistory.length > 0 && chatHistory[0].role === 'model') {
-      chatHistory = chatHistory.slice(1);
-    }
-
-    // Only pass history if it's not empty and starts with user
-    const chat = model.startChat(
-      chatHistory.length > 0 && chatHistory[0].role === 'user'
-        ? { history: chatHistory }
+  // Helper function to try sending a message
+  const trySendMessage = async (currentModel: any, message: string, historyData: any[]) => {
+    const chat = currentModel.startChat(
+      historyData.length > 0 && historyData[0].role === 'user'
+        ? { history: historyData }
         : {}
     );
-
+    
     // Add timeout to prevent hanging requests (30 seconds)
     const timeoutPromise = new Promise((_, reject) => {
       setTimeout(() => reject(new Error('Request timeout after 30 seconds')), 30000);
     });
 
     const result = await Promise.race([
-      chat.sendMessage(userMessage),
+      chat.sendMessage(message),
       timeoutPromise
     ]) as any;
     
-    const response = result.response;
-    const text = response.text();
-    
-    if (!text) {
-      return "I received an empty response. Please try again.";
+    return result.response.text();
+  };
+
+  try {
+    // Build conversation history for context
+    let chatHistory = history.map(h => ({
+      role: h.role,
+      parts: [{ text: h.parts }]
+    }));
+
+    if (chatHistory.length > 0 && chatHistory[0].role === 'model') {
+      chatHistory = chatHistory.slice(1);
     }
-    
-    return text;
+
+    // Try with the current model (Gemini 3)
+    try {
+      const text = await trySendMessage(model, userMessage, chatHistory);
+      if (!text) throw new Error("Empty response");
+      return text;
+    } catch (primaryError: any) {
+      // Check if we should try a fallback model
+      const errorMsg = primaryError?.message || primaryError?.toString() || '';
+      const isQuotaError = errorMsg.includes('quota') || errorMsg.includes('429') || errorMsg.includes('RESOURCE_EXHAUSTED');
+      const isNotFoundError = errorMsg.includes('not found') || errorMsg.includes('404');
+      
+      // If it's a quota or not found error, try fallback to 2.5 Flash
+      if ((isQuotaError || isNotFoundError) && genAI) {
+        console.warn("Primary model failed (quota/404), switching to fallback: gemini-2.5-flash");
+        
+        // Initialize fallback model
+        const fallbackModel = genAI.getGenerativeModel({ 
+          model: "gemini-2.5-flash",
+          systemInstruction: SYSTEM_PROMPT,
+        });
+        
+        // Retry with fallback
+        const text = await trySendMessage(fallbackModel, userMessage, chatHistory);
+        
+        // If successful, permanently switch model to avoid future errors in this session
+        model = fallbackModel;
+        
+        return text;
+      }
+      
+      throw primaryError; // Re-throw if it's not an error we can handle with fallback
+    }
+
   } catch (error: any) {
     console.error("AI Chat Error Details:", error);
     
