@@ -11,7 +11,7 @@ interface ComparisonProps {
 const Comparison: React.FC<ComparisonProps> = () => {
   return (
     <section 
-      className="min-h-full flex flex-col justify-center px-4 md:px-6 relative py-16 md:py-20"
+      className="min-h-full flex flex-col justify-center px-4 md:px-6 relative py-16 md:py-20 pb-32 md:pb-20"
       aria-labelledby="comparison-title"
     >
       <div className="container mx-auto max-w-5xl">
@@ -31,7 +31,7 @@ const Comparison: React.FC<ComparisonProps> = () => {
         </motion.div>
 
         {/* Mobile View: Cards */}
-        <div className="block lg:hidden space-y-3">
+        <div className="block lg:hidden space-y-3 mb-8">
           {CONTENT.comparison.rows.map((row, index) => (
             <div
               key={index}

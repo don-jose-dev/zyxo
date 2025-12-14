@@ -66,10 +66,10 @@ export default function App() {
         
         // If content overflows
         if (scrollHeight > clientHeight) {
-          // Scrolling down, but not at bottom yet
-          if (deltaY > 0 && scrollTop + clientHeight < scrollHeight - 1) return;
+          // Scrolling down, but not at bottom yet (use 5px buffer for better mobile support)
+          if (deltaY > 0 && scrollTop + clientHeight < scrollHeight - 5) return;
           // Scrolling up, but not at top yet
-          if (deltaY < 0 && scrollTop > 1) return;
+          if (deltaY < 0 && scrollTop > 5) return;
         }
       }
 
@@ -100,8 +100,9 @@ export default function App() {
       if (currentSection) {
         const { scrollTop, scrollHeight, clientHeight } = currentSection;
         if (scrollHeight > clientHeight) {
-          if (deltaY > 0 && scrollTop + clientHeight < scrollHeight - 1) return;
-          if (deltaY < 0 && scrollTop > 1) return;
+          // Use 5px buffer for better mobile support
+          if (deltaY > 0 && scrollTop + clientHeight < scrollHeight - 5) return;
+          if (deltaY < 0 && scrollTop > 5) return;
         }
       }
 
