@@ -36,6 +36,12 @@ jobs:
         env:
           GITHUB_ACTIONS: true
 
+      - name: Ensure CNAME exists
+        run: |
+          if [ ! -f dist/CNAME ]; then
+            echo "zyxo.app" > dist/CNAME
+          fi
+
       - name: Setup Pages
         uses: actions/configure-pages@v4
 

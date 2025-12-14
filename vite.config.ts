@@ -4,8 +4,9 @@ import react from '@vitejs/plugin-react';
 
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, '.', '');
+    // Use custom domain base path - GitHub Pages will serve from root when custom domain is configured
     return {
-      base: process.env.GITHUB_ACTIONS ? '/zyxo/' : '/',
+      base: '/',
       server: {
         port: 3000,
         host: '0.0.0.0',
